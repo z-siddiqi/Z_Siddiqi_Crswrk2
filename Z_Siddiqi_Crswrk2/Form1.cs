@@ -20,11 +20,11 @@ namespace Z_Siddiqi_Crswrk2
         private void Form1_Load(object sender, EventArgs e)
         {
             //Initialise the text boxes
-            textBox1.Text = "4.572";
-            textBox2.Text = "0.726";
-            textBox3.Text = "0.4";
-            textBox4.Text = "6.283";
-            textBox5.Text = "-1.2";
+            textBox1.Text = "9";
+            textBox2.Text = "1.5";
+            textBox3.Text = "1";
+            textBox4.Text = "5.93";
+            textBox5.Text = "0";
             textBox6.Text = "0";
             textBox7.Text = "4";
         }
@@ -46,18 +46,18 @@ namespace Z_Siddiqi_Crswrk2
 
             double[] spanwiseLocation = { 0.2, 0.4, 0.6, 0.8 };
 
-            for (int i = 1; i < 5; i++)
+            for (int i = 1; i <= 4; i++)
             {
                 int column = 0;
 
-                double alpha = (aoaRoot - washout / 4 * i) * Math.PI / 180;
+                double alpha = (aoaRoot - washout / 5 * i) * Math.PI / 180;
 
                 double phi = Math.Acos(spanwiseLocation[i - 1]);
                 double mu = Mu(ae, b, cr, taperRatio, phi);
 
                 RHS[i - 1] = mu * (alpha - alphaZeroLift) * Math.Sin(phi);
 
-                for (int j = 1; j < 9; j += 2)
+                for (int j = 1; j <= 7; j += 2)
                 {
                     LHS[i - 1][column] = Math.Sin(j * phi) * (j * mu + Math.Sin(phi));
 
@@ -69,16 +69,10 @@ namespace Z_Siddiqi_Crswrk2
             double[] A = MatrixVectorProduct(ILHS, RHS);
 
             double CL = A[0] * Math.PI * Ar(b, cr, taperRatio);
-            
-            double delta = 0;
-
-            for (int i = 1; i <= 3; i++)
-            {
-                delta = (i + 2) * (Math.Pow(A[i], 2) / Math.Pow(A[0], 2));
-            }
-
             double CD = Math.Pow(CL, 2) / (Math.PI * Ar(b, cr, taperRatio)) *
-                    (1 + delta);
+                    (1 + 3 * (Math.Pow(A[1], 2) / Math.Pow(A[0], 2)) + 
+                    5 * (Math.Pow(A[2], 2) / Math.Pow(A[0], 2)) +
+                    7 * (Math.Pow(A[3], 2) / Math.Pow(A[0], 2)));
 
             // Set the relevant text boxes to their calculated value
             textBox8.Text = Convert.ToString(A[0]);
