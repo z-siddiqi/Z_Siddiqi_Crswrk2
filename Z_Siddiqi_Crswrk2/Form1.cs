@@ -41,23 +41,25 @@ namespace Z_Siddiqi_Crswrk2
 
             double aoaRoot = Convert.ToDouble(textBox7.Text);
 
-            double[] RHS = new double[4];
-            double[][] LHS = MatrixCreate(4, 4);
+            double[] RHS = new double[6];
+            double[][] LHS = MatrixCreate(6, 6);
 
-            double[] spanwiseLocation = { 0.2, 0.4, 0.6, 0.8 };
+            //double[] spanwiseLocation = { 0.2, 0.4, 0.6, 0.8 };
+            double[] spanwiseLocation = { 0.143, 0.286, 0.429, 0.571, 0.714, 0.857 };
+            //double[] spanwiseLocation = { 0.111, 0.222, 0.333, 0.444, 0.555, 0.666, 0.777, 0.888 };
 
-            for (int i = 1; i <= 4; i++)
+            for (int i = 1; i <= 6; i++)
             {
                 int column = 0;
 
-                double alpha = (aoaRoot - washout / 5 * i) * Math.PI / 180;
+                double alpha = (aoaRoot - washout / 7 * i) * Math.PI / 180;
 
                 double phi = Math.Acos(spanwiseLocation[i - 1]);
                 double mu = Mu(ae, b, cr, taperRatio, phi);
 
                 RHS[i - 1] = mu * (alpha - alphaZeroLift) * Math.Sin(phi);
 
-                for (int j = 1; j <= 7; j += 2)
+                for (int j = 1; j <= 11; j += 2)
                 {
                     LHS[i - 1][column] = Math.Sin(j * phi) * (j * mu + Math.Sin(phi));
 
@@ -72,7 +74,9 @@ namespace Z_Siddiqi_Crswrk2
             double CD = Math.Pow(CL, 2) / (Math.PI * Ar(b, cr, taperRatio)) *
                     (1 + 3 * (Math.Pow(A[1], 2) / Math.Pow(A[0], 2)) + 
                     5 * (Math.Pow(A[2], 2) / Math.Pow(A[0], 2)) +
-                    7 * (Math.Pow(A[3], 2) / Math.Pow(A[0], 2)));
+                    7 * (Math.Pow(A[3], 2) / Math.Pow(A[0], 2)) +
+                    9 * (Math.Pow(A[4], 2) / Math.Pow(A[0], 2)) +
+                    11 * (Math.Pow(A[5], 2) / Math.Pow(A[0], 2)));
 
             // Set the relevant text boxes to their calculated value
             textBox8.Text = Convert.ToString(A[0]);
