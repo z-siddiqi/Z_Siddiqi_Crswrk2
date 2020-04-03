@@ -44,17 +44,13 @@ namespace Z_Siddiqi_Crswrk2
             double[] RHS = new double[6];
             double[][] LHS = MatrixCreate(6, 6);
 
-            //double[] spanwiseLocation = { 0.2, 0.4, 0.6, 0.8 };
-            double[] spanwiseLocation = { 0.143, 0.286, 0.429, 0.571, 0.714, 0.857 };
-            //double[] spanwiseLocation = { 0.111, 0.222, 0.333, 0.444, 0.555, 0.666, 0.777, 0.888 };
-
             for (int i = 1; i <= 6; i++)
             {
                 int column = 0;
 
                 double alpha = (aoaRoot - washout / 7 * i) * Math.PI / 180;
 
-                double phi = Math.Acos(spanwiseLocation[i - 1]);
+                double phi = Math.Acos((double)i / 7);
                 double mu = Mu(ae, b, cr, taperRatio, phi);
 
                 RHS[i - 1] = mu * (alpha - alphaZeroLift) * Math.Sin(phi);
