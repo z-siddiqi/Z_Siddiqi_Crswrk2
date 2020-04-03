@@ -44,7 +44,7 @@ namespace Z_Siddiqi_Crswrk2
             double[] RHS = new double[4];
             double[][] LHS = MatrixCreate(4, 4);
 
-            double[] loc = {22.5, 45, 67.5, 90};
+            double[] spanwiseLocation = { 0.2, 0.4, 0.6, 0.8 };
 
             for (int i = 1; i < 5; i++)
             {
@@ -52,7 +52,7 @@ namespace Z_Siddiqi_Crswrk2
 
                 double alpha = (aoaRoot - washout / 4 * i) * Math.PI / 180;
 
-                double phi = loc[i - 1] * Math.PI / 180;
+                double phi = Math.Acos(spanwiseLocation[i - 1]);
                 double mu = Mu(ae, b, cr, taperRatio, phi);
 
                 RHS[i - 1] = mu * (alpha - alphaZeroLift) * Math.Sin(phi);
@@ -69,7 +69,16 @@ namespace Z_Siddiqi_Crswrk2
             double[] A = MatrixVectorProduct(ILHS, RHS);
 
             double CL = A[0] * Math.PI * Ar(b, cr, taperRatio);
-            //double CD = ;
+            
+            double delta = 0;
+
+            for (int i = 1; i <= 3; i++)
+            {
+                delta = (i + 2) * (Math.Pow(A[i], 2) / Math.Pow(A[0], 2));
+            }
+
+            double CD = Math.Pow(CL, 2) / (Math.PI * Ar(b, cr, taperRatio)) *
+                    (1 + delta);
 
             // Set the relevant text boxes to their calculated value
             textBox8.Text = Convert.ToString(A[0]);
@@ -77,6 +86,7 @@ namespace Z_Siddiqi_Crswrk2
             textBox10.Text = Convert.ToString(A[2]);
             textBox11.Text = Convert.ToString(A[3]);
             textBox12.Text = Convert.ToString(CL);
+            textBox13.Text = Convert.ToString(CD);
         }
 
         // Exit button
@@ -85,16 +95,16 @@ namespace Z_Siddiqi_Crswrk2
             Application.Exit();
         }
 
-        static double Ar(double b, double cr, double taperRatio)
-        {
-            return 2 * b / (cr * (1 + taperRatio));
-        }
-
         static double Mu(double ae, double b, double cr, double taperRatio, double phi)
         {
             double AR = Ar(b, cr, taperRatio);
 
             return (ae / (2 * AR * (1 + taperRatio))) * (1 + Math.Cos(phi) * (taperRatio - 1));
+        }
+
+        static double Ar(double b, double cr, double taperRatio)
+        {
+            return 2 * b / (cr * (1 + taperRatio));
         }
 
         // #############################################################//
