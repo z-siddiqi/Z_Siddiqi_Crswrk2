@@ -41,9 +41,9 @@ namespace Z_Siddiqi_Crswrk2
             }
 
             double b = Convert.ToDouble(textBox1.Text);
-            double cr = Convert.ToDouble(textBox2.Text);
+            double rootChord = Convert.ToDouble(textBox2.Text);
             double taperRatio = Convert.ToDouble(textBox3.Text);
-            double ae = Convert.ToDouble(textBox4.Text);
+            double liftcurveSlope = Convert.ToDouble(textBox4.Text);
             double alphaZeroLift = Convert.ToDouble(textBox5.Text) * Math.PI / 180;
             double washout = Convert.ToDouble(textBox6.Text);
             double aoaRoot = Convert.ToDouble(textBox7.Text);
@@ -58,7 +58,7 @@ namespace Z_Siddiqi_Crswrk2
                 double alpha = (aoaRoot - washout / 5 * i) * Math.PI / 180;
 
                 double phi = Math.Acos((double)i / 5);
-                double mu = Mu(ae, b, cr, taperRatio, phi);
+                double mu = Mu(liftcurveSlope, b, rootChord, taperRatio, phi);
 
                 RHS[i - 1] = mu * (alpha - alphaZeroLift) * Math.Sin(phi);
 
@@ -73,8 +73,8 @@ namespace Z_Siddiqi_Crswrk2
             double[][] ILHS = MatrixInverse(LHS);
             double[] A = MatrixVectorProduct(ILHS, RHS);
 
-            double CL = A[0] * Math.PI * Ar(b, cr, taperRatio);
-            double CD = Math.Pow(CL, 2) / (Math.PI * Ar(b, cr, taperRatio)) *
+            double CL = A[0] * Math.PI * Ar(b, rootChord, taperRatio);
+            double CD = Math.Pow(CL, 2) / (Math.PI * Ar(b, rootChord, taperRatio)) *
                     (1 + 3 * (Math.Pow(A[1], 2) / Math.Pow(A[0], 2)) +
                     5 * (Math.Pow(A[2], 2) / Math.Pow(A[0], 2)) +
                     7 * (Math.Pow(A[3], 2) / Math.Pow(A[0], 2)));
