@@ -20,11 +20,11 @@ namespace Z_Siddiqi_Crswrk2
         private void Form1_Load(object sender, EventArgs e)
         {
             //Initialise the text boxes
-            textBox1.Text = "4.572";
-            textBox2.Text = "0.726";
-            textBox3.Text = "0.4";
-            textBox4.Text = "6.283";
-            textBox5.Text = "-1.2";
+            textBox1.Text = "9";
+            textBox2.Text = "1.5";
+            textBox3.Text = "1";
+            textBox4.Text = "5.93";
+            textBox5.Text = "0";
             textBox6.Text = "0";
             textBox7.Text = "4";
         }
@@ -32,32 +32,37 @@ namespace Z_Siddiqi_Crswrk2
         // Calculate button
         private void button1_Click(object sender, EventArgs e)
         {
+            foreach (var control in this.Controls.OfType<TextBox>())
+            {
+                if (String.IsNullOrEmpty(control.Text) || !double.TryParse(control.Text, out double num))
+                {
+                    control.Text = Convert.ToString(0);
+                }
+            }
+
             double b = Convert.ToDouble(textBox1.Text);
-            double cr = Convert.ToDouble(textBox2.Text);
+            double rootChord = Convert.ToDouble(textBox2.Text);
             double taperRatio = Convert.ToDouble(textBox3.Text);
-            double ae = Convert.ToDouble(textBox4.Text);
+            double liftcurveSlope = Convert.ToDouble(textBox4.Text);
             double alphaZeroLift = Convert.ToDouble(textBox5.Text) * Math.PI / 180;
             double washout = Convert.ToDouble(textBox6.Text);
-
             double aoaRoot = Convert.ToDouble(textBox7.Text);
 
             double[] RHS = new double[4];
             double[][] LHS = MatrixCreate(4, 4);
 
-            double[] spanwiseLocation = { 0.2, 0.4, 0.6, 0.8 };
-
-            for (int i = 1; i < 5; i++)
+            for (int i = 1; i <= 4; i++)
             {
                 int column = 0;
 
-                double alpha = (aoaRoot - washout / 4 * i) * Math.PI / 180;
+                double alpha = (aoaRoot - washout / 5 * i) * Math.PI / 180;
 
-                double phi = Math.Acos(spanwiseLocation[i - 1]);
-                double mu = Mu(ae, b, cr, taperRatio, phi);
+                double phi = Math.Acos((double)i / 5);
+                double mu = Mu(liftcurveSlope, b, rootChord, taperRatio, phi);
 
                 RHS[i - 1] = mu * (alpha - alphaZeroLift) * Math.Sin(phi);
 
-                for (int j = 1; j < 9; j += 2)
+                for (int j = 1; j <= 7; j += 2)
                 {
                     LHS[i - 1][column] = Math.Sin(j * phi) * (j * mu + Math.Sin(phi));
 
@@ -68,18 +73,12 @@ namespace Z_Siddiqi_Crswrk2
             double[][] ILHS = MatrixInverse(LHS);
             double[] A = MatrixVectorProduct(ILHS, RHS);
 
-            double CL = A[0] * Math.PI * Ar(b, cr, taperRatio);
-            
-            double delta = 0;
-
-            for (int i = 1; i <= 3; i++)
-            {
-                delta = (i + 2) * (Math.Pow(A[i], 2) / Math.Pow(A[0], 2));
-            }
-
-            double CD = Math.Pow(CL, 2) / (Math.PI * Ar(b, cr, taperRatio)) *
-                    (1 + delta);
-
+            double CL = A[0] * Math.PI * Ar(b, rootChord, taperRatio);
+            double CD = Math.Pow(CL, 2) / (Math.PI * Ar(b, rootChord, taperRatio)) *
+                    (1 + 3 * (Math.Pow(A[1], 2) / Math.Pow(A[0], 2)) +
+                    5 * (Math.Pow(A[2], 2) / Math.Pow(A[0], 2)) +
+                    7 * (Math.Pow(A[3], 2) / Math.Pow(A[0], 2)));
+                    
             // Set the relevant text boxes to their calculated value
             textBox8.Text = Convert.ToString(A[0]);
             textBox9.Text = Convert.ToString(A[1]);
