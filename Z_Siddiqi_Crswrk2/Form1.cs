@@ -19,7 +19,7 @@ namespace Z_Siddiqi_Crswrk2
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            //Initialise the text boxes
+            // Initialise the text boxes
             textBox1.Text = "9";
             textBox2.Text = "1.5";
             textBox3.Text = "1";
@@ -32,14 +32,17 @@ namespace Z_Siddiqi_Crswrk2
         // Calculate button
         private void button1_Click(object sender, EventArgs e)
         {
+            // Loop over all text boxes
             foreach (var control in this.Controls.OfType<TextBox>())
             {
+                // If the textbox is empty or not a number then set it to zero
                 if (String.IsNullOrEmpty(control.Text) || !double.TryParse(control.Text, out double num))
                 {
                     control.Text = Convert.ToString(0);
                 }
             }
 
+            // Create variables for the user inputs
             double b = Convert.ToDouble(textBox1.Text);
             double rootChord = Convert.ToDouble(textBox2.Text);
             double taperRatio = Convert.ToDouble(textBox3.Text);
@@ -48,31 +51,43 @@ namespace Z_Siddiqi_Crswrk2
             double washout = Convert.ToDouble(textBox6.Text);
             double aoaRoot = Convert.ToDouble(textBox7.Text);
 
+            // Create four row vector
             double[] RHS = new double[4];
+
+            // Create four by four matrix
             double[][] LHS = MatrixCreate(4, 4);
 
+            // Loop over all rows
             for (int i = 1; i <= 4; i++)
             {
+                // Initialise column counter
                 int column = 0;
 
+                // Calculate alpha, phi and mu for each spanwise location
                 double alpha = (aoaRoot - washout / 5 * i) * Math.PI / 180;
-
                 double phi = Math.Acos((double)i / 5);
                 double mu = Mu(liftcurveSlope, b, rootChord, taperRatio, phi);
 
+                // Calculate and set RHS vector value
                 RHS[i - 1] = mu * (alpha - alphaZeroLift) * Math.Sin(phi);
 
+                // Loop over all columns
                 for (int j = 1; j <= 7; j += 2)
                 {
+                    // Calculate and set LHS matrix value
                     LHS[i - 1][column] = Math.Sin(j * phi) * (j * mu + Math.Sin(phi));
 
                     column++;
                 }
             }
 
+            // Create inverse LHS matrix
             double[][] ILHS = MatrixInverse(LHS);
+
+            // Calculate the vector product of the inverse LHS matrix and RHS vector
             double[] A = MatrixVectorProduct(ILHS, RHS);
 
+            // Calculate CL and CD
             double CL = A[0] * Math.PI * Ar(b, rootChord, taperRatio);
             double CD = Math.Pow(CL, 2) / (Math.PI * Ar(b, rootChord, taperRatio)) *
                     (1 + 3 * (Math.Pow(A[1], 2) / Math.Pow(A[0], 2)) +
@@ -94,20 +109,23 @@ namespace Z_Siddiqi_Crswrk2
             Application.Exit();
         }
 
+        // This function calculates mu
         static double Mu(double ae, double b, double cr, double taperRatio, double phi)
         {
+            // Calculate the wing aspect ratio
             double AR = Ar(b, cr, taperRatio);
 
             return (ae / (2 * AR * (1 + taperRatio))) * (1 + Math.Cos(phi) * (taperRatio - 1));
         }
 
+        // This function calculates the wing aspect ratio
         static double Ar(double b, double cr, double taperRatio)
         {
             return 2 * b / (cr * (1 + taperRatio));
         }
 
         // #############################################################//
-        //                 matrix methods                               //
+        //                        matrix methods                        //
         //##############################################################//
 
         static double[][] MatrixCreate(int rows, int cols)
