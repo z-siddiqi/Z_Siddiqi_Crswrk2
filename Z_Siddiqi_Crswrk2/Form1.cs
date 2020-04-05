@@ -35,7 +35,7 @@ namespace Z_Siddiqi_Crswrk2
             // Loop over all text boxes
             foreach (var control in this.Controls.OfType<TextBox>())
             {
-                // If the textbox is empty or not a number then set it to zero
+                // If the textbox is empty or it contains letters then set it to zero
                 if (String.IsNullOrEmpty(control.Text) || !double.TryParse(control.Text, out double num))
                 {
                     control.Text = Convert.ToString(0);
